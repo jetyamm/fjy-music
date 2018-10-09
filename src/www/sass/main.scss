@@ -1,0 +1,18 @@
+#main{
+    height: 100%;
+    .recommend{
+        h4{
+            padding: 1rem 0;
+            span{
+                border-left: 0.1rem solid red;  
+                padding-left: 0.5rem;
+            }
+            
+        }
+        .newMusic{
+            height: 22.5rem;
+            overflow: hidden;
+        }
+    }
+    
+}
