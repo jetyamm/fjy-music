@@ -6,8 +6,8 @@ var express = require('express');
 var app = express();
 // 生成一个静态文件，服务器文件夹
 app.use(express.static('www'));
-var sql = require('./sql.js');
 
+var mg = require('./mgdb.js');
 // 爬取网页结构
 function getHTML(){
 	return new Promise(function(resolve,reject){
@@ -25,7 +25,7 @@ function getRecord(body){
 //					console.log($(e).find('img').attr('_src'));
 					request($(e).find('img').attr('_src')).pipe(fs.createWriteStream(`./www/img/${i}.jpg`));
 					
-					sql.query('insert into record set ?', [{
+					mg.myInsert('record', [{
 						title: $(e).text().trim().replace(/\s+/g, ' ').split(' ')[2],
 						name: $(e).text().trim().replace(/\s+/g, ' ').split(' ')[3],
 						audience: $(e).text().trim().replace(/\s+/g, ' ').split(' ')[0],
@@ -51,7 +51,7 @@ function getNewMusic(body){
 			var timeLen = JSON.parse($(e).attr('data')).timeLen;
 //			request(`http://wwwapi.kugou.com/yy/index.php?r=play/getdata&hash=${hash}&album_id=11029259&_=${albumId}`,).pipe(fs.createWriteStream(albumId+'.png'));	
 			request(`http://wwwapi.kugou.com/yy/index.php?r=play/getdata&hash=${hash}&album_id=11029259&_=${albumId}`, function(error, response, bodyMs){
-				sql.query('insert into newMusic set ?',[{
+				mg.myInsert('newmusic',[{
 					hash,
 					time,
 					musicName: fileName,
@@ -71,21 +71,22 @@ function getNewMusic(body){
 getHTML().then(getRecord);
 getHTML().then(getNewMusic);
 // 接受ajax请求返回响应头响应体（相关信息）
+
+
+
 app.get('/getRecord',function(req,res){
 	res.header("Access-Control-Allow-Origin", "*");
-	sql.query('select * from record',[],function(data){
+	mg.myQuery('record',{},function(data){
 		res.send(data);
 	})
 });
 
 app.get('/getNewMusic',function(req,res){
 	res.header("Access-Control-Allow-Origin", "*");
-	sql.query('select * from newMusic',[],function(data){
+	mg.myQuery('newmusic',{},function(data){
 		res.send(data);
 	})
 });
 
-
-
-app.listen(3002);
+app.listen(3003);
 //app.listen(3001);
